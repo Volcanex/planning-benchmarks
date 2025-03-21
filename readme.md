@@ -56,3 +56,8 @@ python benchmark-visualizer.py benchmark_results.csv
 ```
 
 Visualization outputs will be saved in the `benchmark_analysis` directory.
+
+### Citations
+
+https://github.com/gerryai/PDDL4J/tree/master/pddl
+
