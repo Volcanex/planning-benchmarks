@@ -15,7 +15,7 @@ This was used to create graphs as supporting evidence and exploration of claims 
 
 ## Methodology
 
-I used Anthropic's Claude 3.7 Sonnet in conjunction with the filesystem MCP protocol to help rapidly prototype and debug to benchmark and visualize the results of different heuristics on PDDLs. I provided high-level guidence, ajusted paramters and made key edits however the majority of this code is AI written. 
+I used Anthropic's Claude 3.7 Sonnet in conjunction with the filesystem MCP protocol to help rapidly prototype and debug to benchmark and visualize the results of different heuristics on PDDLs. I provided high-level guidence, ajusted paramters and made key edits however the majority of this code is AI written. AI-Assistance was only used for this repositiory and not for any of the corresponding paper.
 
 ## Repo Structure
 
