@@ -1,0 +1,6 @@
+(go-to p4 p1)
+(get-knife p4)
+(go-to p2 p4)
+(push-box p3 p2)
+(climb p3)
+(grab-bananas p3)
