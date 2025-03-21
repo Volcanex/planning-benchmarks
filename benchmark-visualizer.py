@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-This script analyzes and visualizes benchmark results from pyperplan runs,
-comparing A* and GBFS with different heuristics.
-"""
 
 import pandas as pd
 import matplotlib.pyplot as plt
