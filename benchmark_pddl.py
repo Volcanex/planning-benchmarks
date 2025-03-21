@@ -32,6 +32,9 @@ def run_benchmark(domain_file, problem_file, search, heuristic, timeout=5):
     
     cmd.extend([domain_file, problem_file])
     
+    # Create a string representation of the command for logging
+    cmd_str = ' '.join(cmd)
+    
     start_time = time.time()
     
     try:
@@ -52,7 +55,8 @@ def run_benchmark(domain_file, problem_file, search, heuristic, timeout=5):
             "success": "Goal reached" in result.stdout,
             "runtime": elapsed,
             "expanded_nodes": 0,
-            "plan_length": 0
+            "plan_length": 0,
+            "command": cmd_str
         }
         
         # Extract expanded nodes
@@ -79,7 +83,8 @@ def run_benchmark(domain_file, problem_file, search, heuristic, timeout=5):
             "success": False,
             "runtime": elapsed,
             "expanded_nodes": "timeout",
-            "plan_length": "timeout"
+            "plan_length": "timeout",
+            "command": cmd_str
         }
     except Exception as e:
         return {
@@ -90,7 +95,8 @@ def run_benchmark(domain_file, problem_file, search, heuristic, timeout=5):
             "success": False,
             "runtime": time.time() - start_time,
             "expanded_nodes": f"error: {str(e)}",
-            "plan_length": f"error: {str(e)}"
+            "plan_length": f"error: {str(e)}",
+            "command": cmd_str
         }
 
 def read_domain_name_from_file(file_path):
@@ -219,7 +225,7 @@ def main():
     parser.add_argument("--test-invalid", action="store_true",
                         help="Test combinations that might be invalid (like blind with non-astar)")
     parser.add_argument("--debug", action="store_true",
-                        help="Print additional debug information")
+                        help="Print additional debug information including executed commands")
     
     args = parser.parse_args()
     
@@ -329,6 +335,9 @@ def main():
                         heuristic,
                         timeout=args.timeout
                     )
+                    
+                    if args.debug:
+                        print(f"      Command: {stats['command']}")
                     results.append(stats)
                     
                     if isinstance(stats["expanded_nodes"], int):
