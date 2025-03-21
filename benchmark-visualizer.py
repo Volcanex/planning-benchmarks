@@ -156,8 +156,8 @@ def plot_domain_comparison(df, output_dir):
         ('astar', 'hmax'),
         ('gbf', 'hmax'),
         ('astar', 'blind'),
-        ('astar', 'landmark'),
-        ('gbf', 'landmark')
+        ('astar', 'hadd'),
+        ('gbf', 'hadd')
     ]
     
     filtered_data = domain_success[
@@ -176,9 +176,9 @@ def plot_domain_comparison(df, output_dir):
     palette = {
         'astar_hmax': '#E63946',     # red
         'astar_blind': '#F9ADA0',    # light red
-        'astar_landmark': '#C1121F', # dark red
+        'astar_hadd': '#C1121F',     # dark red
         'gbf_hmax': '#1D7A8C',       # teal
-        'gbf_landmark': '#40A9BF'     # light blue
+        'gbf_hadd': '#40A9BF'        # light blue
     }
     
     chart = sns.barplot(
@@ -261,6 +261,159 @@ def plot_runtime_by_domain(df, output_dir):
     
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'runtime_by_domain.png'), dpi=300, bbox_inches='tight')
+    plt.close()
+
+def plot_nodes_by_domain(df, output_dir):
+    """Plot expanded nodes comparison across domains for all algorithm-heuristic combinations"""
+    plt.figure(figsize=(16, 10))
+    
+    # Filter for successful runs only
+    success_df = df[df['success'] == True].copy()
+    success_df['algorithm_heuristic'] = success_df['search'] + '_' + success_df['heuristic']
+    
+    # Group by domain and algorithm_heuristic
+    nodes_by_domain = success_df.groupby(['domain', 'algorithm_heuristic'])['expanded_nodes'].mean().reset_index()
+    
+    # Create a custom color palette for algorithm-heuristic combinations
+    # A* variants in red tones, GBFS variants in blue-green tones
+    unique_combos = nodes_by_domain['algorithm_heuristic'].unique()
+    
+    # Generate color palette
+    colors = {}
+    for combo in unique_combos:
+        if combo.startswith('astar'):
+            # Red tones for A*
+            if 'hmax' in combo:
+                colors[combo] = '#E63946'  # Strong red for A* with hmax
+            elif 'hadd' in combo:
+                colors[combo] = '#F4A582'  # Medium red for A* with hadd
+            elif 'hff' in combo:
+                colors[combo] = '#D6604D'  # Light red for A* with hff
+            else:
+                colors[combo] = '#B2182B'  # Dark red for other A* variants
+        else:  # gbf
+            # Blue-green tones for GBFS
+            if 'hmax' in combo:
+                colors[combo] = '#1D7A8C'  # Strong teal for GBFS with hmax
+            elif 'hadd' in combo:
+                colors[combo] = '#4393C3'  # Medium blue for GBFS with hadd
+            elif 'hff' in combo:
+                colors[combo] = '#2166AC'  # Light blue for GBFS with hff
+            else:
+                colors[combo] = '#053061'  # Dark blue for other GBFS variants
+    
+    # Create the plot
+    ax = sns.barplot(
+        x='domain', 
+        y='expanded_nodes', 
+        hue='algorithm_heuristic', 
+        data=nodes_by_domain, 
+        palette=colors
+    )
+    
+    plt.title('Average Expanded Nodes by Domain and Algorithm-Heuristic Combination', fontsize=16)
+    plt.ylabel('Expanded Nodes', fontsize=14)
+    plt.xlabel('Domain', fontsize=14)
+    plt.xticks(rotation=45)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.legend(title='Algorithm_Heuristic', bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Add text labels on top of each bar
+    for container in ax.containers:
+        ax.bar_label(container, fmt='%.0f', fontsize=8)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'nodes_by_domain.png'), dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    # Also create a log scale version for better comparison
+    plt.figure(figsize=(16, 10))
+    ax = sns.barplot(
+        x='domain', 
+        y='expanded_nodes', 
+        hue='algorithm_heuristic', 
+        data=nodes_by_domain, 
+        palette=colors
+    )
+    
+    plt.title('Average Expanded Nodes by Domain and Algorithm-Heuristic Combination (Log Scale)', fontsize=16)
+    plt.ylabel('Expanded Nodes (log scale)', fontsize=14)
+    plt.xlabel('Domain', fontsize=14)
+    plt.yscale('log')
+    plt.xticks(rotation=45)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.legend(title='Algorithm_Heuristic', bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Add text labels on top of each bar (for log scale)
+    for container in ax.containers:
+        labels = [f'{int(v)}' if not np.isnan(v) else '' for v in container.datavalues]
+        ax.bar_label(container, labels=labels, fontsize=8)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'nodes_by_domain_log.png'), dpi=300, bbox_inches='tight')
+    plt.close()
+
+def plot_planlength_by_domain(df, output_dir):
+    """Plot plan length comparison across domains for all algorithm-heuristic combinations"""
+    plt.figure(figsize=(16, 10))
+    
+    # Filter for successful runs only
+    success_df = df[df['success'] == True].copy()
+    success_df['algorithm_heuristic'] = success_df['search'] + '_' + success_df['heuristic']
+    
+    # Group by domain and algorithm_heuristic
+    length_by_domain = success_df.groupby(['domain', 'algorithm_heuristic'])['plan_length'].mean().reset_index()
+    
+    # Create a custom color palette for algorithm-heuristic combinations
+    # A* variants in red tones, GBFS variants in blue-green tones
+    unique_combos = length_by_domain['algorithm_heuristic'].unique()
+    
+    # Generate color palette
+    colors = {}
+    for combo in unique_combos:
+        if combo.startswith('astar'):
+            # Red tones for A*
+            if 'hmax' in combo:
+                colors[combo] = '#E63946'  # Strong red for A* with hmax
+            elif 'hadd' in combo:
+                colors[combo] = '#F4A582'  # Medium red for A* with hadd
+            elif 'hff' in combo:
+                colors[combo] = '#D6604D'  # Light red for A* with hff
+            else:
+                colors[combo] = '#B2182B'  # Dark red for other A* variants
+        else:  # gbf
+            # Blue-green tones for GBFS
+            if 'hmax' in combo:
+                colors[combo] = '#1D7A8C'  # Strong teal for GBFS with hmax
+            elif 'hadd' in combo:
+                colors[combo] = '#4393C3'  # Medium blue for GBFS with hadd
+            elif 'hff' in combo:
+                colors[combo] = '#2166AC'  # Light blue for GBFS with hff
+            else:
+                colors[combo] = '#053061'  # Dark blue for other GBFS variants
+    
+    # Create the plot
+    ax = sns.barplot(
+        x='domain', 
+        y='plan_length', 
+        hue='algorithm_heuristic', 
+        data=length_by_domain, 
+        palette=colors
+    )
+    
+    plt.title('Average Plan Length by Domain and Algorithm-Heuristic Combination', fontsize=16)
+    plt.ylabel('Plan Length (steps)', fontsize=14)
+    plt.xlabel('Domain', fontsize=14)
+    plt.xticks(rotation=45)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.legend(title='Algorithm_Heuristic', bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Add text labels on top of each bar
+    for container in ax.containers:
+        ax.bar_label(container, fmt='%.1f', fontsize=8)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'planlength_by_domain.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def generate_summary_report(df, output_path):
@@ -386,6 +539,8 @@ def main():
     plot_expanded_nodes_comparison(df, args.output_dir)
     plot_domain_comparison(df, args.output_dir)
     plot_runtime_by_domain(df, args.output_dir)
+    plot_nodes_by_domain(df, args.output_dir)
+    plot_planlength_by_domain(df, args.output_dir)
     
     # Generate report
     report_path = os.path.join(args.output_dir, "benchmark_report.md")
